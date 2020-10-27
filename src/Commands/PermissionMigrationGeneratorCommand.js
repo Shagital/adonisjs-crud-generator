@@ -3,8 +3,8 @@
 const { Command } = require('@adonisjs/ace');
 const Helpers = use('Helpers');
 const {pascalCase, getTableColumnsAndTypes, validateConnection} = require(`${__dirname}/../Common/helpers`);
-const fs = require('fs')
-const util = require('util')
+const fs = require('fs');
+const util = require('util');
 const execSync = util.promisify(require('child_process').execSync);
 const tableColumns = getTableColumnsAndTypes();
 
@@ -14,11 +14,11 @@ class PermissionMigrationGeneratorCommand extends Command {
             { table: Table to generate permission migration for }
             { --migrate: Run new migration }
             { --connection=@value: Specify custom DB connection to use }
-            `
+            `;
   }
 
   static get description () {
-    return 'Generate CRUD for a table'
+    return 'Generate CRUD for a table';
   }
 
   async handle (args, options) {
@@ -27,7 +27,8 @@ class PermissionMigrationGeneratorCommand extends Command {
     }
 
     let tableName = args.table.toLowerCase();
-    let columnsTypes = await tableColumns(tableName, options.connection);
+
+    await tableColumns(tableName, options.connection);
 
     let migrationFile = `${__dirname}/../templates/migration.js`;
     let vm = this;
@@ -39,7 +40,8 @@ class PermissionMigrationGeneratorCommand extends Command {
         .replace(new RegExp('{{model}}', 'g'), tableName)
         .replace(new RegExp('{{pascalCase}}', 'g'), pascalCase(tableName));
 
-      fs.writeFile(Helpers.databasePath(`migrations/admin_permissions_for_${tableName}.js`), data, async function (err) {
+      let migrationPath = Helpers.databasePath(`migrations/admin_permissions_for_${tableName}.js`);
+      fs.writeFile(migrationPath, data, async function (err) {
 
         if(options.migrate) {
           await vm.runMigration();
@@ -54,6 +56,7 @@ class PermissionMigrationGeneratorCommand extends Command {
   async runMigration() {
     this.info('Run migration');
     let vm = this;
+
     execSync(`node ace migration:run`, {stdio: 'inherit'}, (e, stdout, stderr) => {
       if (!stdout.includes('Database migrated successfully')) {
         return vm.error(`Error: ${stdout}`);
@@ -65,4 +68,4 @@ class PermissionMigrationGeneratorCommand extends Command {
   }
 }
 
-module.exports = PermissionMigrationGeneratorCommand
+module.exports = PermissionMigrationGeneratorCommand;

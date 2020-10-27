@@ -11,11 +11,11 @@ class CrudGeneratorCommand extends Command {
             { table: Table to generate CRUD for }
             {--migrate: Automatically run newly created migration }
             {--connection=@value: Specify custom DB connection to use}
-            `
+            `;
   }
 
   static get description () {
-    return 'Generate CRUD for a table'
+    return 'Generate CRUD for a table';
   }
 
   async handle (args, options) {
@@ -24,20 +24,21 @@ class CrudGeneratorCommand extends Command {
     }
 
     let tableName = args.table;
+
+    // this is just to check if the table exists and fail at this point
     let columns = await tableColumns(tableName, options.connection);
 
-    let vm = this;
     execSync(`node ace crud:model ${tableName} ${options.connection ? `--connection=${options.connection}` : ``}`, (e, stdout, stderr) => {
-      return;
+
     });
     execSync(`node ace crud:controller ${tableName} ${options.connection ? `--connection=${options.connection}` : ``}`, (e, stdout, stderr) => {
-      return;
+
     });
     execSync(`node ace crud:permission ${tableName} ${options.migrate ? '--migrate' : ''} ${options.connection ? `--connection=${options.connection}` : ``}`, (e, stdout, stderr) => {
-      return;
+
     });
     execSync(`node ace crud:view ${tableName} ${options.connection ? `--connection=${options.connection}` : ``}`, (e, stdout, stderr) => {
-      return;
+
     });
 
     this.info('Done');
@@ -45,4 +46,4 @@ class CrudGeneratorCommand extends Command {
   }
 }
 
-module.exports = CrudGeneratorCommand
+module.exports = CrudGeneratorCommand;

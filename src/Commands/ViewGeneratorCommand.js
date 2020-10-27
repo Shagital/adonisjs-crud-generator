@@ -5,9 +5,7 @@ const Config = use('Config');
 const Env = use('Env');
 const Helpers = use('Helpers');
 const {pascalCase, getTableColumnsAndTypes, validateConnection} = require(`${__dirname}/../Common/helpers`);
-const fs = require('fs')
-const util = require('util')
-const execSync = util.promisify(require('child_process').execSync);
+const fs = require('fs');
 const tableColumns = getTableColumnsAndTypes();
 const pluralize = require('pluralize');
 
@@ -16,11 +14,11 @@ class ViewGeneratorCommand extends Command {
     return `crud:view
             { table: Table to generate view templates for }
             {--connection=@value: Specify custom DB connection to use }
-            `
+            `;
   }
 
   static get description() {
-    return 'Generate view templates for a table'
+    return 'Generate view templates for a table';
   }
 
   async handle(args, options) {
@@ -38,15 +36,15 @@ class ViewGeneratorCommand extends Command {
     let pascalPlural = pluralize.plural(pascalName);
 
     Promise.all([
-      this.copyAndUpdateViews({plural: plural, pascalPlural: pascalPlural, pascalName: pascalName, singular: singular}),
-      this.updateRoutes({plural: plural, pascalName: pascalName, pascalPlural:pascalPlural}),
-      this.copyAndUpdateStore({singular: singular, plural: plural, pascalName: pascalName}),
-      this.updateStoreImport({singular: singular}),
-      this.updateSidebar({singular:singular, pascalPlural:pascalPlural, plural:plural})
+      this.copyAndUpdateViews({plural, pascalPlural, pascalName, singular}),
+      this.updateRoutes({plural, pascalName, pascalPlural}),
+      this.copyAndUpdateStore({singular, plural, pascalName}),
+      this.updateStoreImport({singular}),
+      this.updateSidebar({singular, pascalPlural, plural})
     ]).then(() => {
       this.info('Done');
       process.exit();
-    })
+    });
 
   }
 
@@ -107,7 +105,7 @@ class ViewGeneratorCommand extends Command {
 import ${pascalName} from "@/pages/${plural}/Layout.vue";
 import ${pascalName}Index from "@/pages/${plural}/Index.vue";
 import ${pascalName}Form from "@/pages/${plural}/Form.vue";
-`
+`;
 
       let routes = `
       {
@@ -165,8 +163,7 @@ import ${pascalName}Form from "@/pages/${plural}/Form.vue";
       Helpers.viewsPath(`admin/src/store/${singular}/store.js`)
     ];
 
-    let vm = this;
-    let baseUrl = `${Env.get('APP_URL')}/${Config.get('crudGenerator.admin_prefix')}`;
+    const baseUrl = `${Env.get('APP_URL')}/${Config.get('crudGenerator.admin_prefix')}`;
 
     for (let path of paths) {
       let data = fs.readFileSync(path, 'utf8');
@@ -195,7 +192,7 @@ import ${pascalName}Form from "@/pages/${plural}/Form.vue";
       data = data.toString();
 
       if(!data.includes(`import {${singular}} from './${singular}/store';\n` + storeImportMarker)) {
-        data = data.replace(storeImportMarker, `import {${singular}} from './${singular}/store';\n` + storeImportMarker)
+        data = data.replace(storeImportMarker, `import {${singular}} from './${singular}/store';\n` + storeImportMarker);
       }
 
       if(!data.includes(`${singular},\n` + storeExportMarker)) {
@@ -251,20 +248,20 @@ import ${pascalName}Form from "@/pages/${plural}/Form.vue";
     let string = '';
 
     Object.keys(columns).forEach(columnName => {
-      if(!columns[columnName]['primary'] && !['created_at','updated_at'].includes(columnName)) {
+      if(!columns[columnName].primary && !['created_at','updated_at'].includes(columnName)) {
         let column = columns[columnName];
-        let validationRules = column['nullable'] ? '' : 'required|';
+        let validationRules = column.nullable ? '' : 'required|';
         let columnType;
 
         switch (column['type']) {
           case 'string':
-            columnType = column['length'] > 100 ? 'textarea' : 'text';
-            validationRules += column['length'] > 0 ? `|max:${column['length']}` : '';
+            columnType = column.length > 100 ? 'textarea' : 'text';
+            validationRules += column.length > 0 ? `|max:${column.length}` : '';
             break;
           case 'number':
             columnType = 'number';
             validationRules += `numeric`;
-            validationRules += column['length'] > 0 ? `|max:${column['length']}` : ''
+            validationRules += column.length > 0 ? `|max:${column.length}` : '';
             break;
           case 'datetime':
             columnType = 'datetime';
@@ -297,14 +294,12 @@ import ${pascalName}Form from "@/pages/${plural}/Form.vue";
       <label>${pascalCase(columnName)}</label>
 
       <md-${
-          columnType == 'checkbox'
-            ? 'checkbox'
+          columnType == 'checkbox' ? 'checkbox'
             : (
-              columnType == 'textarea'
-            ? 'textarea'
+              columnType == 'textarea' ? 'textarea'
                 : 'input'
             )
-        } ${column['length'] > 0 ? `max="${column['length']}"` : ''} name="${columnName}" v-validate="'${validationRules}'" v-model="body.${columnName}" :class="'${columnType}'" type="${columnType}"/>
+        } ${column.length > 0 ? `max="${column.length}"` : ''} name="${columnName}" v-validate="'${validationRules}'" v-model="body.${columnName}" :class="'${columnType}'" type="${columnType}"/>
     </md-field>
     <small
       class="form-text text-danger"
@@ -312,7 +307,7 @@ import ${pascalName}Form from "@/pages/${plural}/Form.vue";
     >{{errors.first('${columnName}')}}</small>
 
   </div>
-`
+`;
       }
     });
 
@@ -331,14 +326,14 @@ import ${pascalName}Form from "@/pages/${plural}/Form.vue";
   title: "${pascalCase(columnName)}",
   active: true,
   cvisible: false,
-  sortable: ${['string', 'int', 'datetime', 'date'].includes(column['type']) ? true : false},
-  ${column['length'] > 100 ? `
+  sortable: ${(['string', 'int', 'datetime', 'date'].includes(column.type))},
+  ${column.length > 100 ? `
   callback: s => {
     return truncate(s)
   }
  ` : ``}
 },
-`
+`;
       });
 
     return string;
@@ -347,4 +342,4 @@ import ${pascalName}Form from "@/pages/${plural}/Form.vue";
 
 }
 
-module.exports = ViewGeneratorCommand
+module.exports = ViewGeneratorCommand;

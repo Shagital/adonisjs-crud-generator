@@ -1,6 +1,6 @@
 var db = use('Database');
 const Config = use('Config');
-const fs = require('fs')
+const fs = require('fs');
 const supportedTypes = ['mysql', 'sqlite3', 'pg'];
 var Database = {};
 
@@ -37,8 +37,8 @@ const getTableColumnsAndTypes = () => {
       cache[tableName] = columns;
      return columns;
     }
-  }
-}
+  };
+};
 
 async function mysqlColumns(tableName, dbName) {
   let columns = {};
@@ -59,31 +59,28 @@ async function mysqlColumns(tableName, dbName) {
   Object.keys(queryResult[0]).forEach(key => {
     let s = queryResult[0][key];
 
-    let primaryTable = (s['primary_table'] || '').split('.')[1] || null;
-    let primaryColumn = s['pk_column_name']
-    let relationName = (s['fk_constraint_name'] || '')
+    let primaryTable = (s.primary_table || '').split('.')[1] || null;
+    let primaryColumn = s.pk_column_name;
+    let relationName = (s.fk_constraint_name || '')
       .replace(tableName, '')
       .replace('foreign', '')
-      .replace('id', '')
+      .replace('id', '');
     columns[s.COLUMN_NAME] = {
-      type: ['timestamp', 'datetime'].includes(s['DATA_TYPE'])
-        ? 'datetime' : (
-          ['date'].includes(s['DATA_TYPE']) ? 'date' : (
-            ['varchar', 'text'].includes(s['DATA_TYPE']) ? 'string' : (
-              (s['DATA_TYPE'] == 'boolean' || s['COLUMN_TYPE'] == 'tinyint(1)')
-                ? 'boolean'
+      type: ['timestamp', 'datetime'].includes(s.DATA_TYPE) ? 'datetime' : (
+          ['date'].includes(s.DATA_TYPE) ? 'date' : (
+            ['varchar', 'text'].includes(s.DATA_TYPE) ? 'string' : (
+              (s.DATA_TYPE == 'boolean' || s.COLUMN_TYPE == 'tinyint(1)') ? 'boolean'
                 : (
-                  s['DATA_TYPE'].includes('int') || ['decimal', 'enum'].includes(s['DATA_TYPE'])
-                    ? 'number'
+                  s.DATA_TYPE.includes('int') || ['decimal', 'enum'].includes(s.DATA_TYPE) ? 'number'
                     : 'others')
             )
           )
         ),
-      unique: !!(['UNI', "PRI"].includes(s['COLUMN_KEY'])),
-      primary: !!(s['COLUMN_KEY'] == 'PRI'),
-      nullable: !!(s['IS_NULLABLE'] == 'YES'),
-      length: s['CHARACTER_MAXIMUM_LENGTH'],
-      autoincrement: !!(s['EXTRA'] == 'auto_increment'),
+      unique: ['UNI', "PRI"].includes(s.COLUMN_KEY),
+      primary: s.COLUMN_KEY == 'PRI',
+      nullable: s.IS_NULLABLE == 'YES',
+      length: s.CHARACTER_MAXIMUM_LENGTH,
+      autoincrement: s.EXTRA == 'auto_increment',
       primary_table : primaryTable,
       primary_column: primaryColumn,
       relation_name: relationName,
@@ -101,7 +98,7 @@ async function pgsqlColumns(tableName) {
 SELECT * FROM information_schema.columns WHERE table_name = '${tableName}';
 `);
 
-  let tableColumns = tableColumnsQuery['rows'];
+  let tableColumns = tableColumnsQuery.rows;
 
   let indexQuery = await Database.raw(`
  select
@@ -128,7 +125,7 @@ order by
     i.relname;
       `);
 
-  let indexes = indexQuery['rows'];
+  let indexes = indexQuery.rows;
 
   let foreignKeysQuery = await Database.raw(`
       SELECT
@@ -149,38 +146,36 @@ FROM
 WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='${tableName}';
       `);
 
-  indexes = indexes.concat(foreignKeysQuery['rows']);
+  indexes = indexes.concat(foreignKeysQuery.rows);
 
   Object.keys(tableColumns).forEach(key => {
     let tableColumn = tableColumns[key];
-    let columnName = tableColumn['column_name'];
-    let columnType = tableColumn['data_type'].split(' ')[0];
-    let foreign = foreignKeysQuery['rows'].find(s => s['column_name'] === columnName);
+    let columnName = tableColumn.column_name;
+    let columnType = tableColumn.data_type.split(' ')[0];
+    let foreign = foreignKeysQuery.rows.find(s => s.column_name === columnName);
 
     columns[columnName] = {
-      type: ['timestamp', 'datetime'].includes(columnType)
-        ? 'datetime' : (
+      type: ['timestamp', 'datetime'].includes(columnType) ? 'datetime' : (
           ['date'].includes(columnType) ? 'date' : (
             ['varchar', 'text', 'character'].includes(columnType) ? 'string' : (
-              columnType.includes('int') || ['decimal', 'enum'].includes(columnType)
-                ? 'number' : (columnType == 'boolean' ? 'boolean' : 'others')
+              columnType.includes('int') || ['decimal', 'enum'].includes(columnType) ? 'number'
+                : (columnType == 'boolean' ? 'boolean' : 'others')
             )
           )
         ),
-      unique: !!indexes.find(s => s['column_names'] === columnName && s['index_name'] && s['index_name'].split('_').slice(-1)[0] === 'unique'),
-      primary: !!indexes.find(s => s['column_names'] === columnName && s['index_name'] && s['index_name'].split('_').slice(-1)[0] === 'pkey'),
-      nullable: tableColumn['is_nullable'] === 'YES',
-      length: tableColumn['numeric_precision'] || tableColumn['character_maximum_length'],
-      autoincrement: (tableColumn['column_default'] && tableColumn['column_default'].includes(`${tableColumn['table_name']}_${tableColumn['column_name']}_seq`)),
-      primary_table : foreign ? foreign['foreign_table_name'] : null,
-      primary_column: foreign ? foreign['foreign_column_name'] : null,
-      relation_name: foreign
-        ? foreign['constraint_name']
+      unique: !!indexes.find(s => s.column_names === columnName && s.index_name && s.index_name.split('_').slice(-1)[0] === 'unique'),
+      primary: !!indexes.find(s => s.column_names === columnName && s.index_name && s.index_name.split('_').slice(-1)[0] === 'pkey'),
+      nullable: tableColumn.is_nullable === 'YES',
+      length: tableColumn.numeric_precision || tableColumn.character_maximum_length,
+      autoincrement: (tableColumn.column_default && tableColumn.column_default.includes(`${tableColumn.table_name}_${tableColumn.column_name}_seq`)),
+      primary_table : foreign ? foreign.foreign_table_name : null,
+      primary_column: foreign ? foreign.foreign_column_name : null,
+      relation_name: foreign ? foreign.constraint_name
           .replace(tableName, '')
           .replace('foreign', '')
           .replace('id', '')
         : null,
-    }
+    };
   });
 
   return columns;
@@ -188,15 +183,15 @@ WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='${tableName}';
 
 async function sqliteColumns(tableName) {
   let columns = {};
-  queryResult = await Database.raw(`PRAGMA table_info('${tableName}');`);
+  let queryResult = await Database.raw(`PRAGMA table_info('${tableName}');`);
   let foreignKeys = await Database.raw(`PRAGMA foreign_key_list('${tableName}');`);
   let indexes = await Database.raw(`PRAGMA index_list('${tableName}');`);
 
   for(let i in indexes) {
-    indexes[i]['indexes'] = await Database.raw(`PRAGMA index_info('${indexes[i]['name']}');`);
+    indexes[i].indexes = await Database.raw(`PRAGMA index_info('${indexes[i].name}');`);
   }
 
-  let pkCheck = await Database.raw(`SELECT COUNT(*) as pk FROM sqlite_sequence WHERE name='${tableName}';`)
+  let pkCheck = await Database.raw(`SELECT COUNT(*) as pk FROM sqlite_sequence WHERE name='${tableName}';`);
 
   Object.keys(queryResult).forEach(key => {
     let tableColumn = queryResult[key];
@@ -205,28 +200,27 @@ async function sqliteColumns(tableName) {
     let columnType = splitColumn[0];
     let length = splitColumn[1] ? splitColumn[1].split(')')[0] : null;
 
-    let foreignCol = foreignKeys.find(s => s['from'] == columnName);
-    let index = indexes.find(s => !!s['indexes'].find(b => b['name'] == columnName))
+    let foreignCol = foreignKeys.find(s => s.from == columnName);
+    let index = indexes.find(s => !!s.indexes.find(b => b.name == columnName));
 
     columns[columnName] = {
-      type: ['timestamp', 'datetime'].includes(columnType)
-        ? 'datetime' : (
+      type: ['timestamp', 'datetime'].includes(columnType) ? 'datetime' : (
           ['date'].includes(columnType) ? 'date' : (
             ['varchar', 'text'].includes(columnType) ? 'string' : (
-              columnType.includes('int') || ['decimal', 'enum'].includes(columnType)
-                ? 'number' : (columnType == 'boolean' ? 'boolean' : 'others')
+              columnType.includes('int') || ['decimal', 'enum'].includes(columnType) ? 'number'
+                : (columnType == 'boolean' ? 'boolean' : 'others')
             )
           )
         ),
-      unique: !!(index && index['unique'] === 1),
-      primary: tableColumn['pk'] === 1,
-      nullable: tableColumn['notnull'] === 0,
+      unique: (index && index.unique === 1),
+      primary: tableColumn.pk === 1,
+      nullable: tableColumn.notnull === 0,
       length: length > 0 ? parseInt(length) : null,
-      autoincrement: pkCheck[0]['pk'] === 0,
-      primary_table : foreignCol ? foreignCol['table'] : null,
-      primary_column: foreignCol ? foreignCol['to'] : null,
-      relation_name: foreignCol ? foreignCol['from'].replace('_id', '') : null,
-    }
+      autoincrement: pkCheck[0].pk === 0,
+      primary_table : foreignCol ? foreignCol.table : null,
+      primary_column: foreignCol ? foreignCol.to : null,
+      relation_name: foreignCol ? foreignCol.from.replace('_id', '') : null,
+    };
   });
 
   return columns;
@@ -319,10 +313,10 @@ function camelCase(str) {
 }
 
 function random(length = 10) {
-  var result           = '';
-  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  var charactersLength = characters.length;
-  for ( var i = 0; i < length; i++ ) {
+  let result           = '';
+  let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let charactersLength = characters.length;
+  for ( let i = 0; i < length; i++ ) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
@@ -340,4 +334,4 @@ module.exports = {
   camelCase,
   random,
   validateConnection
-}
+};
