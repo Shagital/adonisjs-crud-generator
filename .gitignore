@@ -1,0 +1,10 @@
+# IDE
+.idea
+.DS_Store
+test/coverage/
+# Node modules
+node_modules
+
+# Adonis directory for storing tmp files
+.nyc_output
+yarn.lock
