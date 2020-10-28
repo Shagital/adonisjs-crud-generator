@@ -106,5 +106,8 @@ export default {
   padding-bottom: 7em;
   padding-top: 4em;
 }
+.md-card-header {
+  margin-top: -10px;
+}
 </style>
 

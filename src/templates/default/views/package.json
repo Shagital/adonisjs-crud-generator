@@ -47,7 +47,9 @@
     "vue-toast-notification": "^0.5.4",
     "vue2-transitions": "0.3.0",
     "vuex": "^3.4.0",
-    "vuetable-2": "^1.7.5"
+    "vuetable-2": "^1.7.5",
+    "nprogress": "^0.2.0",
+    "vue-nprogress": "^0.2.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "4.2.3",

@@ -29,7 +29,6 @@
         class="page-header header-filter"
         :class="setPageClass"
         filter-color="black"
-        :style="setBgImage"
       >
         <div class="container md-offset">
           <zoom-center-transition
@@ -91,15 +90,6 @@ export default {
     };
   },
   computed: {
-    setBgImage() {
-      let images = {
-        Login: process.env.VUE_APP_APP_BASE_URL + "/img/login.jpg",
-        Register: process.env.VUE_APP_APP_BASE_URL + "/img/register.jpg",
-      };
-      return {
-        backgroundImage: `url(${images[this.$route.name]})`
-      };
-    },
     setPageClass() {
       return `${this.$route.name}-page`.toLowerCase();
     }

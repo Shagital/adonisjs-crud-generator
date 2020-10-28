@@ -53,7 +53,7 @@ Vue.router = router;
 // always clear session storage on page reload
 Vue.use(VueAuth, {
   auth: {
-    request: function (req, token, org) {
+    request: function (req, token) {
       this.options.http._setHeaders.call(this, req, {
         Authorization: 'Bearer ' + token,
       });

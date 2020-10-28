@@ -1,5 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css';
 
 Vue.use(VueRouter);
 
@@ -20,37 +22,16 @@ const router = new VueRouter({
   linkExactActiveClass: "nav-item active"
 });
 
-// Creates a `nextMiddleware()` function which not only
-// runs the default `next()` callback but also triggers
-// the subsequent Middleware function.
-function nextFactory(context, middleware, index) {
-  const subsequentMiddleware = middleware[index];
-  // If no subsequent Middleware exists,
-  // the default `next()` callback is returned.
-  if (!subsequentMiddleware)
-    return context.next;
-
-  return (...parameters) => {
-    // Run the default Vue Router `next()` callback first.
-    context.next(...parameters);
-    // Then run the subsequent Middleware with a new
-    // `nextMiddleware()` callback.
-    const nextMiddleware = nextFactory(context, middleware, index + 1);
-    subsequentMiddleware({...context, next: nextMiddleware});
-  };
-}
-
 router.beforeEach((to, from, next) => {
-
-  if (to.meta.middleware) {
-    const middleware = Array.isArray(to.meta.middleware) ? to.meta.middleware : [to.meta.middleware];
-    const context = {from, next, to, router};
-    const nextMiddleware = nextFactory(context, middleware, 1);
-
-    return middleware[0]({...context, next: nextMiddleware});
+  if (to.name) {
+    NProgress.start()
   }
-
   return next();
 });
+
+router.afterEach((to, from) => {
+  // Complete the animation of the route progress bar.
+  NProgress.done();
+})
 
 export default router;

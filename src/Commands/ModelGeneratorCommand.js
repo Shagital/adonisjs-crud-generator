@@ -2,10 +2,13 @@
 
 const { Command } = require('@adonisjs/ace');
 const Helpers = use('Helpers');
-const {pascalCase, camelCase, getTableColumnsAndTypes, validateConnection} = require(`${__dirname}/../Common/helpers`);
-const fs = require('fs')
-const util = require('util')
-const execSync = util.promisify(require('child_process').execSync);
+const {
+  pascalCase,
+  camelCase,
+  getTableColumnsAndTypes,
+  validateConnection
+} = require(`${__dirname}/../Common/helpers`);
+const fs = require('fs');
 const tableColumns = getTableColumnsAndTypes();
 const pluralize = require('pluralize');
 
@@ -14,11 +17,11 @@ class ModelGeneratorCommand extends Command {
     return `crud:model
             { table: Table to generate model and relationships for }
             {--connection=@value: Specify custom DB connection to use }
-            `
+            `;
   }
 
   static get description () {
-    return 'Generate model and relationships for a table'
+    return 'Generate model and relationships for a table';
   }
 
   async handle (args, options) {
@@ -27,7 +30,7 @@ class ModelGeneratorCommand extends Command {
     }
 
     let tableName = args.table.toLowerCase();
-    let columnsTypes = await tableColumns(tableName, options.connection);
+    let columnTypes = await tableColumns(tableName, options.connection);
 
     let singular = pluralize.singular(tableName);
     let modelFile = `${__dirname}/../templates/model.js`;
@@ -35,7 +38,7 @@ class ModelGeneratorCommand extends Command {
     let vm = this;
 
     fs.readFile(modelFile, async function (err, data) {
-      data = await vm.generateString(data, {columnsTypes:columnsTypes,singular:singular,tableName:tableName, pascalName: pascalName});
+      data = await vm.generateString(data, {columnTypes, singular, tableName, pascalName});
 
       fs.writeFile(Helpers.appRoot(`app/Models/${pascalName}.js`), data, function (err) {
         process.exit();
@@ -44,10 +47,10 @@ class ModelGeneratorCommand extends Command {
 
   }
 
-  async generateString(data, {columnsTypes, singular, tableName, pascalName}) {
+  async generateString(data, {columnTypes, tableName, pascalName}) {
     this.info('Generate model data');
 
-    let columns = Object.keys(columnsTypes);
+    let columns = Object.keys(columnTypes);
 
     let primary = {};
     let dates = [];
@@ -59,12 +62,12 @@ class ModelGeneratorCommand extends Command {
     let relationshipArray = [];
     let hidden = [];
 
-    Object.keys(columnsTypes).forEach(columnName => {
-      let column = columnsTypes[columnName];
+    Object.keys(columnTypes).forEach(columnName => {
+      let column = columnTypes[columnName];
 
-      if(column['primary']) {
+      if(column.primary) {
         primary = column;
-        primary['name'] = columnName;
+        primary.name = columnName;
       } else if (columnName == 'password') {
         hidden.push(columnName);
         hash = `const Hash = use('Hash')`;
@@ -72,51 +75,46 @@ class ModelGeneratorCommand extends Command {
     this.addHook('beforeCreate', async (modelInstance) => {
       modelInstance.password = await Hash.make(modelInstance.password)
     });
- `
+ `;
       }
-      else if(
-        ['timestamp', 'datetime', 'date'].includes(column['type'])
-      ) {
+      else if(['timestamp', 'datetime', 'date'].includes(column.type)) {
         dates.push(columnName);
 
-        if(['timestamp', 'datetime'].includes(column['type'])) {
+        if(['timestamp', 'datetime'].includes(column.type)) {
           dateCast += `
     if (field === '${columnName}') {
       return value.format('LLL')
     }
-`
+`;
           dateFormat += `
      if (field === '${columnName}') {
         return value.getFullYear() + "-" + (value.getMonth() + 1) + "-" + value.getDate() + " " +
             value.getHours() + ":" + value.getMinutes() + ":" + value.getSeconds()
      }
-`
+`;
         } else {
           dateCast += `
     if (field === '${columnName}') {
       return value.format('LL')
      }
-`
+`;
           dateFormat += `
     if (field === '${columnName}') {
       return value.getFullYear() + "-" + (value.getMonth() + 1) + "-" + value.getDate()
     }
-`
+`;
         }
       }
-      else if(
-        column['primary_table']
-        && column['primary_column']
-        && column['relation_name']
-      ) {
-        let pascal = pascalCase(pluralize.singular(column['primary_table']));
-        let camel = camelCase(pluralize.singular(column['relation_name']));
+      else if(column.primary_table && column.primary_column && column.relation_name) {
+        let pascal = pascalCase(pluralize.singular(column.primary_table));
+        let camel = camelCase(pluralize.singular(column.relation_name));
+
         relationshipArray.push(camel);
         relationships += `
   ${camel}() {
-     return this.belongsTo("App/Models/${pascal}", "${column['primary_column']}", "${columnName}");
+     return this.belongsTo("App/Models/${pascal}", "${column.primary_column}", "${columnName}");
   }
-`
+`;
       }
     });
 
@@ -134,7 +132,7 @@ class ModelGeneratorCommand extends Command {
       .replace('{{relationshipArray}}', relationshipArray.length ? `['${relationshipArray.join("','")}']` : '[]')
       .replace('{{hiddenColumns}}', hidden.length ? `[\n    '${hidden.join(`',\n    '`)}'\n]` : '[]')
       .replace('{{hooks}}', hooks)
-      .replace('{{hash}}', hash)
+      .replace('{{hash}}', hash);
 
     return data;
 
@@ -142,4 +140,4 @@ class ModelGeneratorCommand extends Command {
 
 }
 
-module.exports = ModelGeneratorCommand
+module.exports = ModelGeneratorCommand;

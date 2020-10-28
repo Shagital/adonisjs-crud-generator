@@ -12,10 +12,13 @@
           <h4 class="title">{{paginationData.total}} total {{pascalPlural}}</h4>
         </md-card-header>
         <md-card-content>
+          <div class="md-content md-table md-theme-default">
           <vuetable
             ref="vuetable"
             :api-url="api"
             :first-page="0"
+            :css="table_css.table"
+            :show-sort-icons="true"
             :append-params="moreParams"
             :http-options="{ headers:{ 'Authorization' : 'Bearer ' + $auth.token() } }"
             @vuetable:loaded="loadTable"
@@ -52,6 +55,7 @@
           <div class="text-center" v-if="rowCount <=0 || rowCount === null">
             <slot name="empty"></slot>
           </div>
+          </div>
         </md-card-content>
       </md-card>
     </div>
@@ -75,19 +79,11 @@ export default {
       table_css: VuetableCss,
       api: this.$baseApi + `/{{snakeCase}}`,
       columns: [
-        {
-          name: "__checkbox",
-          titleClass: "center aligned",
-          dataClass: "center aligned",
-          cvisible: false,
-          active: true
-        },
         // Insert columns here
         {
           name: "__slot:actions",
           title: "Actions",
           active: true,
-          cvisible: false
         }
       ],
       moreParams: {},

@@ -18,10 +18,11 @@ This package allows you easily generate admin dashboard for your existing [Adoni
 ## Requirements
 - Node >=12
 - Mysql >=8
+- PostgreSQL >=12
 - Adonis 4
 
 ## Dependencies
-- Adonis ACL for role and permission management
+- [Adonis ACL](https://github.com/enniel/adonis-acl) for role and permission management
 
 ## Installation
 
@@ -37,7 +38,7 @@ yarn add @shagital/adonisjs-crud-generator
 ## Setup
 - `adonis acl:setup` to create role permission migrations
 - `adonis crud:init` to generate default files for admin panel
-- Default admin password will be shown to you when the command is done. In case you forget, you can open the `database/migrations/admin_default_role_permission.js` to see the password. You will be able to change password after login
+- Default admin password will be shown to you when the command is done. Copy it somewhere for login. In case you forget or need to change it, you can open `database/migrations/admin_default_role_permission.js` to see the password. You can also change password after login
 - Update `config/crudGenerator` to specify admin model
 - Add role&permission traits to admin User model:
 ```
@@ -86,8 +87,9 @@ Permission: 'Adonis/Acl/Permission',
 '@shagital/crud-generator/src/Commands/ModelGeneratorCommand',
 '@shagital/crud-generator/src/Commands/ViewGeneratorCommand',
 ```
-- The default admin email is `administrator@webmail.com`. You can change the password before running migration
+- The default admin email is `administrator@webmail.com`. You can change the email before running migration
 - Run migration `adonis migration:run` to create admin user and set up roles and permissions
+- Start your adonis app `adonis serve`
 - Cd to the vue app directory `cd /resources/views/admin`
 - Run `npm install` or `yarn install` to install dependencies
 - At this point, your admin dashboard should be ready to use
@@ -125,16 +127,27 @@ Run `npm run build` or `yarn build`
 
 >Note: In running the commands, if you don't have adonis CLI installed globally, you can use `node ace` instead. For example, to generate CRUD for table posts, run `node ace crud:generate posts`
 
+## Error
+If an error occurs while executing any of the command, it'll crash. Simply check your log to find out what went wrong - likely a file/directory permission issue, then run the command again.
+>Note: The commands always overwrite existing files (with same name)
+
+## Screenshots
+![Login](https://res.cloudinary.com/dfxsd0hw0/image/upload/v1603900517/login_jxzdbs.png)
+
+![Profile](https://res.cloudinary.com/dfxsd0hw0/image/upload/v1603900517/profile_vsqq8y.png)
+
+![List](https://res.cloudinary.com/dfxsd0hw0/image/upload/v1603900519/index_vsv3zx.png)
+
+![Form](https://res.cloudinary.com/dfxsd0hw0/image/upload/v1603900519/form_ihyq1t.png)
+
 ## Todo
-- Support PostgreSQL and SQLite
 - Add tests
+- Add support for React
 
 ## Contributing
-
 If you have a feature you'd like to add, kindly send a Pull Request (PR)
 
 ## Security
-
 If you discover any security related issues, please email [zacchaeus@shagital.com](mailto:zacchaeus@shagital.com) instead of using the issue tracker.
 
 ## Credits
@@ -142,5 +155,4 @@ If you discover any security related issues, please email [zacchaeus@shagital.co
 - [All Contributors](../../contributors)
 
 ## License
-
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.

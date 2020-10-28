@@ -20,7 +20,7 @@ const routes = [
     meta: {auth: true},
     children: [
       {
-        path: "dashboard",
+        path: "/dashboard",
         name: "Dashboard",
         components: {default: Dashboard},
       },
