@@ -18,10 +18,11 @@ This package allows you easily generate admin dashboard for your existing [Adoni
 ## Requirements
 - Node >=12
 - Mysql >=8
+- PostgreSQL >=12
 - Adonis 4
 
 ## Dependencies
-- Adonis ACL for role and permission management
+- [Adonis ACL](https://github.com/enniel/adonis-acl) for role and permission management
 
 ## Installation
 
@@ -125,8 +126,12 @@ Run `npm run build` or `yarn build`
 
 >Note: In running the commands, if you don't have adonis CLI installed globally, you can use `node ace` instead. For example, to generate CRUD for table posts, run `node ace crud:generate posts`
 
+## Error
+If an error occurs while executing any of the command, it'll crash. Simply check your log to find out what went wrong - likely a file/directory permission issue, then run the command again.
+>Note: The commands always overwrite existing files (with same name)
+
+
 ## Todo
-- Support PostgreSQL and SQLite
 - Add tests
 
 ## Contributing
