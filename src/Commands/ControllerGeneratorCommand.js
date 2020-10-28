@@ -5,7 +5,6 @@ const Config = use('Config');
 const Helpers = use('Helpers');
 const {pascalCase, getTableColumnsAndTypes, validateConnection} = require(`${__dirname}/../Common/helpers`);
 const fs = require('fs');
-const util = require('util');
 const tableColumns = getTableColumnsAndTypes();
 const pluralize = require('pluralize');
 
@@ -148,7 +147,7 @@ Route.group(() => {
 }).prefix('${adminPrefix}').middleware(['requestType', 'auth:jwt', 'is:administrator']);
 `;
 
-    let routeFile = Helpers.appRoot(`start/routes.js`)
+    let routeFile = Helpers.appRoot(`start/routes.js`);
     fs.readFile(routeFile, async function (err, data) {
 
       if(!data.includes(string)) {

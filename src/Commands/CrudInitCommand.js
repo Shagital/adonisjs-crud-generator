@@ -7,7 +7,7 @@ const Env = use('Env');
 const { random } = require(`${__dirname}/../Common/helpers`);
 const fs = require('fs');
 const util = require('util');
-const execSync = util.promisify(require('child_process').execSync)
+const execSync = util.promisify(require('child_process').execSync);
 
 class CrudInitCommand extends Command {
   static get signature () {
@@ -30,7 +30,7 @@ class CrudInitCommand extends Command {
     } else {
       prefix = Config.get('crudGenerator.admin_prefix', random(20));
     }
-    this.warn(`Admin route will use prefix: ${prefix}`)
+    this.warn(`Admin route will use prefix: ${prefix}`);
 
     Promise.all([
       this.copyConfig(prefix),
