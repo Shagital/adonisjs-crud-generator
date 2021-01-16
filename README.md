@@ -36,7 +36,27 @@ yarn add @shagital/adonisjs-crud-generator
 ```
 
 ## Setup
+- First install [AdonisjACL](https://github.com/enniel/adonis-acl)
+- Setup ACL and be sure it works fine
 - `adonis acl:setup` to create role permission migrations
+- Define required columns in your Admin User model by adding this method to your User model:
+```
+/**
+   * return a list of all required columns
+  **/
+  static getColumns() {
+    return ['email', 'password']; // add other required fields to the array
+  }
+```
+- In `start/app.js`, add the following to `commands` array:
+```
+'@shagital/adonisjs-crud-generator/src/Commands/CrudInitCommand',
+'@shagital/adonisjs-crud-generator/src/Commands/CrudGeneratorCommand',
+'@shagital/adonisjs-crud-generator/src/Commands/PermissionMigrationGeneratorCommand',
+'@shagital/adonisjs-crud-generator/src/Commands/ControllerGeneratorCommand',
+'@shagital/adonisjs-crud-generator/src/Commands/ModelGeneratorCommand',
+'@shagital/adonisjs-crud-generator/src/Commands/ViewGeneratorCommand',
+```
 - `adonis crud:init` to generate default files for admin panel
 - Default admin password will be shown to you when the command is done. Copy it somewhere for login. In case you forget or need to change it, you can open `database/migrations/admin_default_role_permission.js` to see the password. You can also change password after login
 - Update `config/crudGenerator` to specify admin model
@@ -78,19 +98,10 @@ requestType:'App/Middleware/RequestTypeMiddleware'
 Role: 'Adonis/Acl/Role',
 Permission: 'Adonis/Acl/Permission',
 ```
-- In `start/app.js`, add the following to `commands` array:
-```
-'@shagital/crud-generator/src/Commands/CrudInitCommand',
-'@shagital/crud-generator/src/Commands/CrudGeneratorCommand',
-'@shagital/crud-generator/src/Commands/PermissionMigrationGeneratorCommand',
-'@shagital/crud-generator/src/Commands/ControllerGeneratorCommand',
-'@shagital/crud-generator/src/Commands/ModelGeneratorCommand',
-'@shagital/crud-generator/src/Commands/ViewGeneratorCommand',
-```
 - The default admin email is `administrator@webmail.com`. You can change the email before running migration
 - Run migration `adonis migration:run` to create admin user and set up roles and permissions
 - Start your adonis app `adonis serve`
-- Cd to the vue app directory `cd /resources/views/admin`
+- Cd to the vue app directory `cd resources/views/admin`
 - Run `npm install` or `yarn install` to install dependencies
 - At this point, your admin dashboard should be ready to use
 - Run `npm run dev` or `yarn dev` to start the admin app in development mode
@@ -111,7 +122,7 @@ Navigate to your app and you should see the Region menu on the sidebar
 - `adonis crud:model tableName`: This creates model file with relationships
 - `adonis crud:permission tableName`: This creates migration file for crud permissions
 - `adonis crud:view tableName`: This creates vue files
-- `adonis crud:init tableName`: This runs all of the above commands
+- `adonis crud:generate tableName`: This runs all of the above commands
 
 ## Options
 - `--connection`: This option allows you specify which DB connection to use for the command e.g
