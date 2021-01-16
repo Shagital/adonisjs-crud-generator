@@ -12,10 +12,25 @@ class FillDefaultAdminUserAndPermissions extends Schema
   async up() {
     let roleName = Config.get('crudGenerator.admin_role', 'administrator');
 
-    let user = {
-      name:'administrator',
-      email:Config.get('crudGenerator.admin_email', 'administrator@webmail.com'),
-      password: {{password}}
+    let columns = User.getColumns();
+    let user = {};
+
+    for (let col of columns) {
+      switch (col) {
+        case 'email':
+          user[col] = Config.get('crudGenerator.admin_email', 'administrator@webmail.com');
+          break;
+        case 'password':
+          user[col] = {{password}};
+          break;
+        case 'name':
+        case 'username':
+          user[col] = 'administrator';
+          break;
+        default:
+          user[col] = "" // use empty string for required but not present columns
+          break;
+      }
     }
 
     let permissions = [
@@ -47,6 +62,7 @@ class FillDefaultAdminUserAndPermissions extends Schema
 
 
     let adminUser = await User.findOrCreate({email: user.email}, user);
+    // we need to do this incase it's an existing user. We need to change the password to the newly generated one
     adminUser.password = await Hash.make(user.password);
     await adminUser.save();
 
@@ -56,7 +72,7 @@ class FillDefaultAdminUserAndPermissions extends Schema
       permissionIds.push(permission.id);
     }
 
-    let role = await Role.findOrCreate({name:roleName}, {name:roleName, slug:roleName});
+    let role = await Role.findOrCreate({ name: roleName, slug : roleName }, { name: roleName, slug: roleName });
     await role.permissions().attach(permissionIds);
     await adminUser.roles().attach([role.id])
 
