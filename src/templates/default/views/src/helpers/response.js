@@ -7,7 +7,7 @@ export function handleError(vm, error, message = 'Failed to perform action. Plea
     duration: 3000
   });
 }
-export function handleSuccess(vm, message = 'Failed to perform action. Please try again.') {
+export function handleSuccess(vm, message = 'Action was successful') {
   vm.$toast.success(message, {
     position: "top-right",
     duration: 3000
