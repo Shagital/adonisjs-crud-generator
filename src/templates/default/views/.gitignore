@@ -1,6 +1,0 @@
-/node_modules
-/.idea
-/.vscode
-/dist
-yarn-error.log
-.env

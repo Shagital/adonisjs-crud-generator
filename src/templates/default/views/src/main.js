@@ -44,7 +44,7 @@ import router from "./router";
 import store from "./store";
 
 // global library setup
-Vue.prototype.$baseApi = '{{baseUrl}}';
+Vue.prototype.$baseApi = process.env.VUE_APP_BASE_URI || '{{baseUrl}}';
 Vue.prototype.$profileUrl = Vue.prototype.$baseApi + "/profile";
 Vue.prototype.$loginUrl = Vue.prototype.$baseApi + "/login";
 Vue.prototype.$logoutUrl = Vue.prototype.$baseApi + "/logout";

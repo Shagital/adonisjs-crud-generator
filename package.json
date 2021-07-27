@@ -1,6 +1,6 @@
 {
   "name": "@shagital/adonisjs-crud-generator",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Adonisjs Admin Panel Generator is a package that helps you quickly scaffold your typical CRUD admin interfaces. It generates the admin panel code based on the existing (migrated) table in the database",
   "main": "index.js",
   "scripts": {
