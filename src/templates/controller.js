@@ -1,4 +1,5 @@
 'use strict'
+/** @typedef {import('../../../Models/{{pascalName}}')} */
 const {{pascalName}} = use("App/Models/{{pascalName}}");
 const tableColumns = {{tableColumns}};
 const moment = use("moment");

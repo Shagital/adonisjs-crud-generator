@@ -38,8 +38,9 @@ class FillDefaultAdminUserAndPermissionsFor{{pascalCase}} extends Schema
     permissionIds.push(permission.id);
   }
 
-    let role = await Role.query().where('name', Config.get('crudGenerator.admin_role', 'admininstrator'))
-      .firstOrFail();
+    let role = await Role.query()
+    .where('name', Config.get('crudGenerator.admin_role', 'admininstrator'))
+    .firstOrFail();
     await role.permissions().attach(permissionIds)
     await admin.roles().attach([role.id])
 

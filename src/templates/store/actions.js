@@ -1,50 +1,77 @@
 import axios from 'axios';
 
-const API = '{{baseUrl}}';
+const API = process.env.VUE_APP_BASE_URI || `{{baseUrl}}`;
 
 export default {
-    createOrUpdate({
-                             commit
-                         }, payload) {
+    index({
+        commit
+    }, {per_page = 5, sort = ''}) {
         return new Promise((resolve, reject) => {
-          let method = payload.id ? axios.patch(`${API}/{{plural}}/${payload.id}`, payload) : axios.post(`${API}/{{plural}}`, payload)
-            method
-                .then(({
-                           data
-                       }) => {
-                    resolve(data);
+            let url = `${API}/{{plural}}?sort=${sort}&per_page=${per_page}`;
+            axios.get(url)
+                .then(async ({
+                    data
+                }) => {
+                    commit('SET_{{pascalCapital}}', data);
+                    delete data.data;
+                    commit('SET_{{pascalCapital}}_META', data);
+                    resolve(data.data);
                 })
-                .catch(error => reject(error.response));
+                .catch((error) => {
+                    reject(error.response)
+                });
         });
     },
-  fetch({
-                   commit
-                 }, id) {
-    return new Promise((resolve, reject) => {
-      axios.get(`${API}/{{plural}}/${id}`)
-        .then(({
-                 data: {
-                   data
-                 }
-               }) => {
-          commit('SET_{{pascalCapital}}')
-          resolve(data);
-        })
-        .catch(error => reject(error.response));
-    });
-  },
-  delete({
-          commit
-        }, id) {
-    return new Promise((resolve, reject) => {
-      axios.delete(`${API}/{{plural}}/${id}`)
-        .then(({
-                 data
-               }) => {
-          resolve(data);
-        })
-        .catch(error => reject(error.response));
-    });
-  },
+    getSingle({
+      commit
+  }, id) {
+      return new Promise((resolve, reject) => {
+          let url = `${API}/{{plural}}/${id}`;
+          axios.get(url)
+              .then(async ({
+                  data : {data}
+              }) => {
+                  commit('SET_{{pascalCapital}}', data);
 
+                  resolve(data);
+              })
+              .catch((error) => {
+                  reject(error.response)
+              });
+      });
+  },
+  createOrUpdate({
+    commit
+}, data) {
+    return new Promise((resolve, reject) => {
+      let url = `${API}/{{plural}}${data && data.id ? `/${data.id}` : ''}`;
+      let method = data && data.id ? axios.patch(url, data) : axios.post(url, data);
+        method.then(async ({
+                data
+            }) => {
+
+                resolve(data);
+            })
+            .catch((error) => {
+                reject(error.response)
+            });
+    });
+},
+
+  delete({
+    commit
+}, id) {
+    return new Promise((resolve, reject) => {
+        let url = `${API}/{{plural}}/${id}`;
+        axios.delete(url)
+            .then(async ({
+                data
+            }) => {
+                resolve(data);
+            })
+            .catch((error) => {
+                reject(error.response)
+            });
+    });
+},
 }

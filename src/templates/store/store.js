@@ -5,9 +5,10 @@ import mutations from './mutations';
 export const {{singular}} = {
     namespaced: true,
     state: {
-{{singular}}: {},
+      {{singular}}: {},
+      meta: {},
     },
-        actions,
-        getters,
-        mutations
+    actions,
+    getters,
+    mutations
 }

@@ -1,16 +1,23 @@
 function getTitle (vm) {
   const { title } = vm.$options
-  if (title) {
-    return typeof title === 'function'
-      ? title.call(vm)
-      : title
-  }
+
+  return title;
 }
+
 export default {
-  created () {
-    const title = getTitle(this)
-    if (title) {
-      document.title = `${title} | ${process.env.VUE_APP_NAME || 'Admin Dashboard'}`
-    }
+  mounted () {
+      let title = getTitle(this)
+
+      if(Array.isArray(title)) {
+        let computedTItle = '';
+        for(let key of title) {
+          computedTItle += `${this.$t(key)} | `
+        };
+
+        title = computedTItle;
+      }
+      if (title) {
+          document.title = `${title}${this.$t('admin_dashboard_title')} | ${this.$appName}`
+      }
   }
 }

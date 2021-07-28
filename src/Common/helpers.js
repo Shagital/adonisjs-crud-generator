@@ -1,8 +1,10 @@
 var db = use('Database');
 const Config = use('Config');
 const fs = require('fs');
+const { parse } = require('path');
 const supportedTypes = ['mysql', 'sqlite3', 'pg'];
 var Database = {};
+const url = require('url');
 
 const getTableColumnsAndTypes = () => {
   let cache = {};
@@ -68,10 +70,10 @@ async function mysqlColumns(tableName, dbName) {
     columns[s.COLUMN_NAME] = {
       type: ['timestamp', 'datetime'].includes(s.DATA_TYPE) ? 'datetime' : (
           ['date'].includes(s.DATA_TYPE) ? 'date' : (
-            ['varchar', 'text'].includes(s.DATA_TYPE) ? 'string' : (
+            ['varchar', 'text', 'enum'].includes(s.DATA_TYPE) ? 'string' : (
               (s.DATA_TYPE == 'boolean' || s.COLUMN_TYPE == 'tinyint(1)') ? 'boolean'
                 : (
-                  s.DATA_TYPE.includes('int') || ['decimal', 'enum'].includes(s.DATA_TYPE) ? 'number'
+                  s.DATA_TYPE.includes('int') || ['decimal'].includes(s.DATA_TYPE) ? 'number'
                     : 'others')
             )
           )
@@ -327,11 +329,43 @@ function exitInColors(message) {
   process.exit(1);
 }
 
+function resolveUrl(fullUrl, property) {
+  let parsed = url.parse(fullUrl);
+  return parsed[property]
+}
+
+function validEmail(emailToValidate) {
+
+const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
+return emailRegexp.test(emailToValidate);
+}
+
+function snakeCase(string) {
+  string = String(string);
+
+  return string.replace(/\W+/g, " ")
+  .split(/ |\B(?=[A-Z])/)
+  .map(word => word.toLowerCase())
+  .join('_');
+}
+
+function titleCase(str) {
+  str = String(str);
+  return str.replace(/_/g, ' ').replace(/\w\S*/g, function(word){
+    return word.charAt(0).toUpperCase() + word.substr(1).toLowerCase();
+});
+}
+
 module.exports = {
   getTableColumnsAndTypes,
   slugify,
   pascalCase,
   camelCase,
   random,
-  validateConnection
+  validateConnection,
+  resolveUrl,
+  validEmail,
+  snakeCase,
+  titleCase,
 };

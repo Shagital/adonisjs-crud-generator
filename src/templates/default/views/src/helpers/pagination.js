@@ -2,9 +2,9 @@ function replaceQueryParam(param, newval, search) {
   var questionIndex = search.indexOf('?');
 
   if (questionIndex < 0) {
-    search = search + '?';
-    search = search + param + '=' + newval;
-    return search;
+      search = search + '?';
+      search = search + param + '=' + newval;
+      return search;
   }
 
   var regex = new RegExp("([?;&])" + param + "[^&;]*[;&]?");
@@ -15,23 +15,22 @@ function replaceQueryParam(param, newval, search) {
   return (indexOfEquals >= 0 ? query + '&' : query + '') + (newval ? param + '=' + newval : '');
 }
 
-function getPaginationData(current_url, pagination)
+function getPaginationData(data, moreParams)
 {
+  let current_url = location.href;
+    for (var key in moreParams) {
+        current_url = replaceQueryParam(key, moreParams[key], current_url);
+    }
 
-    let currentPage = parseInt(pagination.page);
-    let perPage = parseInt(pagination.perPage);
-    let prevPage = currentPage > 1 ? currentPage - 1 : null;
-    let nextPage = currentPage != pagination.lastPage ? currentPage + 1 : null;
-
-    return {
-      'total': pagination.total,
-      'per_page': perPage,
-      'current_page': currentPage,
-      'last_page': pagination.lastPage,
-      'next_page_url': replaceQueryParam('page', nextPage, current_url),
-      'prev_page_url': replaceQueryParam('page', prevPage, current_url),
-      'from': ((currentPage * perPage) - perPage) + 1,
-      'to': currentPage * perPage
-    };
+        return {
+            'total': data.total,
+            'per_page': data.perPage,
+            'current_page': data.page,
+            'last_page': data.lastPage,
+            'next_page_url': data.page > 1 ? replaceQueryParam('page', data.page, current_url) : null,
+            'prev_page_url': data.page != data.lastPage ? replaceQueryParam('page', data.page - 1, current_url) : null,
+            'from': ((parseInt(data.page) * parseInt(data.perPage)) - parseInt(data.perPage)) + 1,
+            'to': parseInt(data.page) * parseInt(data.perPage)
+        };
 }
 export default getPaginationData

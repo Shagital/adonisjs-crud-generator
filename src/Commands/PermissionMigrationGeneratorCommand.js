@@ -2,7 +2,11 @@
 
 const { Command } = require('@adonisjs/ace');
 const Helpers = use('Helpers');
-const {pascalCase, getTableColumnsAndTypes, validateConnection} = require(`${__dirname}/../Common/helpers`);
+const {
+  pascalCase,
+  getTableColumnsAndTypes,
+  validateConnection
+} = require(`${__dirname}/../Common/helpers`);
 const fs = require('fs');
 const util = require('util');
 const execSync = util.promisify(require('child_process').execSync);
@@ -36,11 +40,12 @@ class PermissionMigrationGeneratorCommand extends Command {
     this.info('Add migration file');
     fs.readFile(migrationFile, function (err, data) {
 
+      let migrationPath = Helpers.databasePath(`migrations/admin_permissions_for_${tableName}.js`);
+
       data = data.toString()
         .replace(new RegExp('{{model}}', 'g'), tableName)
         .replace(new RegExp('{{pascalCase}}', 'g'), pascalCase(tableName));
 
-      let migrationPath = Helpers.databasePath(`migrations/admin_permissions_for_${tableName}.js`);
       fs.writeFile(migrationPath, data, async function (err) {
 
         if(options.migrate) {

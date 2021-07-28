@@ -1,22 +1,29 @@
 'use strict'
 const {validateAll} = use('Validator');
 const Hash = use('Hash');
+const Config = use('Config');
+const User = use(Config.get('crudGenerator.admin_user', 'App/Models/AdminUser'));
 
 class ProfileController {
 
-  async updatePassword({auth, response, request, session}) {
+  async updateProfile({auth, response, request, session}) {
     let is_ajax = request.is_ajax;
     let user = await auth.getUser();
 
     const rules = {
-      old_password: 'required|min:8',
-      password: 'required|min:8|same:confirm_password',
+      old_password: 'required_when:password|string|min:8',
+      password: 'required_when:old_password|min:8|same:confirm_password|different:old_password',
+      email: 'required|email',
     };
 
-    const validation = await validateAll(request.all(), rules)
+    let data = request.all();
+    const validation = await validateAll(data, rules)
 
     let customErrors = [];
-    let verify = await Hash.verify(request.input('old_password'), user.password);
+
+    if(data.old_password) {
+    let verify = await Hash.verify(data.old_password, user.password);
+
     if(!verify) {
       customErrors.push({
           message:"Provided password is incorrect",
@@ -25,23 +32,37 @@ class ProfileController {
         }
       )
     }
+  }
+
     if (validation.fails() || customErrors.length) {
       let errorMessages = (validation.messages() || []).concat(customErrors);
+
       if(is_ajax) {
         return response.status(422).send(errorMessages)
       }
+
       session
         .withErrors(errorMessages)
-        .flashExcept(['password'])
+        .flashExcept(['password', 'old_password', 'confirm_password'])
 
       return response.redirect('back')
     }
 
-    user.password = await Hash.make(request.input('password'));
-    console.log('password', request.input('password'));
-    await user.save();
+    if(data.password) {
+      user.password = data.password;
+    }
 
-    let msg = 'Your password has been updated successfully';
+    let prevEmail = user.email;
+
+    await User.query()
+    .where('email', user.email).update({
+      password: user.password,
+      email: data.email,
+    });
+
+    let msg = `Your password${data.email != prevEmail ? ' and email' : ''} has been updated successfully.`
+    msg += ` You'll be required to login wuth new details next time`;
+
     session.put('alert-success', msg);
 
     is_ajax ? response.send({message:msg}) : response.redirect('back')
@@ -77,10 +98,22 @@ class ProfileController {
 
     const data = request.only(['email', 'password']);
 
-    let token = await auth.attempt(data.email, data.password);
+    let token = Config.get('auth.authenticator')  === 'jwt' ? await auth.withRefreshToken().attempt(data.email, data.password) : await auth.attempt(data.email, data.password);
 
     return is_ajax ? response.send({data:token}) : view.render('admin.profile.edit');
 
+  }
+
+  async refresh({ auth, response, request }) {
+    let refreshToken = request.header('refresh-token') || request.input('_refresh_token');
+
+    // refesh tokens and invalidate old tokens
+    let result = await Promise.all([
+       auth.newRefreshToken().generateForRefreshToken(refreshToken),
+      auth.revokeTokens([refreshToken], true),
+    ]);
+
+    return response.send(result[0]);
   }
 
   async logout({auth, response, request, view}) {

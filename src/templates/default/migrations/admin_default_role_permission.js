@@ -13,11 +13,10 @@ class FillDefaultAdminUserAndPermissions extends Schema
     let roleName = Config.get('crudGenerator.admin_role', 'administrator');
 
     let user = {
-      email:Config.get('crudGenerator.admin_email', 'administrator@webmail.com'),
+      email: Config.get('crudGenerator.admin_email', 'administrator@webmail.com'),
       password: {{password}}
     }
 
-    // ensure required columns are set to non-null
     let requiredColumns = User.getColumns();
 
     for(let column of requiredColumns) {
@@ -55,8 +54,10 @@ class FillDefaultAdminUserAndPermissions extends Schema
 
 
     let adminUser = await User.findOrCreate({email: user.email}, user);
-    adminUser.password = await Hash.make(user.password);
-    await adminUser.save();
+    await User.query()
+    .where('id', adminUser.id)
+    .update({password: await Hash.make(user.password)});
+
 
     let permissionIds = [];
     for(let p of permissions) {
@@ -64,7 +65,7 @@ class FillDefaultAdminUserAndPermissions extends Schema
       permissionIds.push(permission.id);
     }
 
-    let role = await Role.findOrCreate({name:roleName}, {name:roleName, slug:roleName});
+    let role = await Role.findOrCreate({slug:roleName}, {name:roleName, slug:roleName});
     await role.permissions().attach(permissionIds);
     await adminUser.roles().attach([role.id])
 

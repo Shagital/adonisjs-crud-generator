@@ -3,9 +3,12 @@
 const { Command } = require('@adonisjs/ace');
 const Config = use('Config');
 const Helpers = use('Helpers');
-const {pascalCase, getTableColumnsAndTypes, validateConnection} = require(`${__dirname}/../Common/helpers`);
+const {
+  pascalCase,
+  getTableColumnsAndTypes,
+  validateConnection
+} = require(`${__dirname}/../Common/helpers`);
 const fs = require('fs');
-const util = require('util');
 const tableColumns = getTableColumnsAndTypes();
 const pluralize = require('pluralize');
 
@@ -39,6 +42,7 @@ class ControllerGeneratorCommand extends Command {
 
       let controllerPath = Helpers.appRoot(`app/Controllers/Http/Admin/${pascalName}Controller.js`);
       data = await vm.generateString(data, {columnTypes, singular, tableName, pascalName});
+
       fs.writeFile(controllerPath, data, function () {
 
         // update application route file with new routes
@@ -94,16 +98,23 @@ class ControllerGeneratorCommand extends Command {
         case 'datetime':
           columnRule += `date`;
           filters += `
-    if(${filterValue}) {
-      query.where('${columnName}', moment(${filterValue}).format('YYYY-MM-DD HH:mm:ss'));
+    if(${filterValue}_from) {
+      query.where('${columnName}', '>=', moment(${filterValue}).format('YYYY-MM-DD HH:mm:ss'));
+    }
+    if(${filterValue}_to) {
+      query.where('${columnName}', '<=', moment(${filterValue}).format('YYYY-MM-DD HH:mm:ss'));
     }
         `;
           break;
         case 'date':
           columnRule += `date`;
           filters += `
-    if(${filterValue}) {
-      query.where('${columnName}', moment(${filterValue}).format('YYYY-MM-DD'));
+    if(${filterValue}_from) {
+      query.where('${columnName}', '>=', moment(${filterValue}).format('YYYY-MM-DD'));
+    }
+
+    if(${filterValue}_to) {
+      query.where('${columnName}', '<=', moment(${filterValue}).format('YYYY-MM-DD'));
     }
        `;
           break;

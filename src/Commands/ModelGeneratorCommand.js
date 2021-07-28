@@ -83,7 +83,7 @@ class ModelGeneratorCommand extends Command {
         if(['timestamp', 'datetime'].includes(column.type)) {
           dateCast += `
     if (field === '${columnName}') {
-      return value.format('LLL')
+      return value.format('lll')
     }
 `;
           dateFormat += `
@@ -95,7 +95,7 @@ class ModelGeneratorCommand extends Command {
         } else {
           dateCast += `
     if (field === '${columnName}') {
-      return value.format('LL')
+      return value.format('ll')
      }
 `;
           dateFormat += `

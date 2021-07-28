@@ -1,4 +1,11 @@
 module.exports = {
-  outputDir : '../../../public/admin',
-  publicPath : '/admin/'
+  lintOnSave: false,
+  pluginOptions: {
+    i18n: {
+      locale: 'en',
+      fallbackLocale: 'en',
+      localeDir: 'locales',
+      enableInSFC: true
+    }
+  }
 }

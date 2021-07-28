@@ -1,32 +1,68 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
+import Vue from 'vue'
+import VueRouter from 'vue-router'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css';
 
-Vue.use(VueRouter);
+import Dashboard from "@/views/Dashboard.vue";
+import Login from "@/views/Auth/Login.vue";
+import Profile from "@/views/Auth/Profile.vue";
 
-// router setup
-import routes from "./routes";
+import Error404 from "@/views/Errors/404.vue";
+import Error403 from "@/views/Errors/403.vue";
+// Import Model Components Here. Do not remove this line
 
-// configure router
-const router = new VueRouter({
-  mode: "hash",
-  routes, // short for routes: routes
-  scrollBehavior: to => {
-    if (to.hash) {
-      return {selector: to.hash};
-    } else {
-      return {x: 0, y: 0};
-    }
+Vue.use(VueRouter)
+
+const routes = [
+  {
+    path: "/login",
+    name: "Login",
+    component: Login,
+    meta: { layout: "empty", auth : false },
   },
-  linkExactActiveClass: "nav-item active"
+  {
+    path: "/",
+    name: "Dashboard",
+    component: Dashboard,
+    meta: { auth : true },
+  },
+  {
+    path: "/403",
+    name: "Forbidden",
+    component: Error403,
+    meta: { layout: "empty", auth : false },
+  },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: Profile,
+    meta: { auth : true },
+  },
+ // Import Model Routes Here. Do not remove this line
+  {
+    path: "*",
+    component: Error404,
+  },
+
+];
+
+const router = new VueRouter({
+  mode: 'history',
+  baseUrl: process.env.BASE_URL,
+  linkActiveClass: 'is-active',
+  scrollBehavior: (t) => {
+      return {
+          y: 0
+      }
+  },
+  routes
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeResolve((to, from, next) => {
   if (to.name) {
-    NProgress.start()
+      NProgress.start()
   }
-  return next();
+  next();
 });
 
 router.afterEach((to, from) => {
@@ -34,4 +70,4 @@ router.afterEach((to, from) => {
   NProgress.done();
 })
 
-export default router;
+export default router

@@ -16,10 +16,10 @@ This package allows you easily generate admin dashboard for your existing [Adoni
 - SQLite
 
 ## Requirements
-- Node >=12
-- Mysql >=8
-- PostgreSQL >=12
-- Adonis 4
+- Adonisjs v4
+- Node >=8
+- Mysql >=5
+- PostgreSQL >=10
 
 ## Dependencies
 - [Adonis ACL](https://github.com/enniel/adonis-acl) for role and permission management
@@ -36,8 +36,8 @@ yarn add @shagital/adonisjs-crud-generator
 ```
 
 ## Setup
-- `adonis acl:setup` to create role permission migrations
-- `adonis crud:init` to generate default files for admin panel
+- Run `adonis acl:setup` to create role permission migrations if you've not already done that
+- Run `adonis crud:init` to generate default files for admin panel.
 - Default admin password will be shown to you when the command is done. Copy it somewhere for login. In case you forget or need to change it, you can open `database/migrations/admin_default_role_permission.js` to see the password. You can also change password after login
 - Update `config/crudGenerator` to specify admin model
 - Add role&permission traits to admin User model:
@@ -129,16 +129,18 @@ Run `npm run build` or `yarn build`
 
 ## Error
 If an error occurs while executing any of the command, it'll crash. Simply check your log to find out what went wrong - likely a file/directory permission issue, then run the command again.
->Note: The commands always overwrite existing files (with same name)
+>Note: Except otherwise stated, the commands always overwrite existing files (with same name)
 
 ## Screenshots
-![Login](https://res.cloudinary.com/dfxsd0hw0/image/upload/v1603900517/login_jxzdbs.png)
+![Login](screenshots/1.png)
 
-![Profile](https://res.cloudinary.com/dfxsd0hw0/image/upload/v1603900517/profile_vsqq8y.png)
+![Dashboard](screenshots/2.png)
 
-![List](https://res.cloudinary.com/dfxsd0hw0/image/upload/v1603900519/index_vsv3zx.png)
+![Profile](screenshots/3.png)
 
-![Form](https://res.cloudinary.com/dfxsd0hw0/image/upload/v1603900519/form_ihyq1t.png)
+![List](screenshots/4.png)
+
+![Form](screenshots/5.png)
 
 ## Todo
 - Add tests
