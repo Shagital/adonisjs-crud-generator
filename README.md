@@ -3,6 +3,8 @@
 ![npm (scoped)](https://img.shields.io/npm/v/@shagital/adonisjs-crud-generator)
 ![NPM](https://img.shields.io/npm/l/@shagital/adonisjs-crud-generator)
 
+Version [for **Adonis v4**]
+
 This package allows you easily generate admin dashboard for your existing [AdonisJS](https://adonisjs.com/) app. The package generates the following:
 - Migrations
 - Controllers
@@ -36,10 +38,36 @@ yarn add @shagital/adonisjs-crud-generator
 ```
 
 ## Setup
+- Open `start/kernel.js` and make sure `'Adonis/Acl/Init'` is in the globalMiddleware array
+- In `start/kernel.js`, add the following to `namedMiddleware`:
+```
+is: 'Adonis/Acl/Is',
+can: 'Adonis/Acl/Can',
+requestType:'App/Middleware/RequestTypeMiddleware'
+``` 
+- In `start/app.js`, make sure the following exists in `providers` array:
+```
+'adonis-acl/providers/AclProvider',
+'@adonisjs/validator/providers/ValidatorProvider'
+```
+- In `start/app.js`, add the following to `alias` array:
+```
+Role: 'Adonis/Acl/Role',
+Permission: 'Adonis/Acl/Permission',
+```
+- In `start/app.js`, add the following to `commands` array:
+```
+'@shagital/adonisjs-crud-generator/src/Commands/CrudInitCommand',
+'@shagital/adonisjs-crud-generator/src/Commands/CrudGeneratorCommand',
+'@shagital/adonisjs-crud-generator/src/Commands/PermissionMigrationGeneratorCommand',
+'@shagital/adonisjs-crud-generator/src/Commands/ControllerGeneratorCommand',
+'@shagital/adonisjs-crud-generator/src/Commands/ModelGeneratorCommand',
+'@shagital/adonisjs-crud-generator/src/Commands/ViewGeneratorCommand',
+```
 - Run `adonis acl:setup` to create role permission migrations if you've not already done that
 - Run `adonis crud:init` to generate default files for admin panel.
 - Default admin password will be shown to you when the command is done. Copy it somewhere for login. In case you forget or need to change it, you can open `database/migrations/admin_default_role_permission.js` to see the password. You can also change password after login
-- Update `config/crudGenerator` to specify admin model
+- Update `config/crudGenerator.js` to specify admin model
 - Add role&permission traits to admin User model:
 ```
 static get traits () {
@@ -61,36 +89,10 @@ static get traits () {
 - Don't forget to uncomment the view codes in the generated controller files
 
 ##
-- Open `start/kernel.js` and make sure `'Adonis/Acl/Init'` is in the globalMiddleware array
-- In `start/kernel.js`, add the following to `namedMiddleware`:
-```
-is: 'Adonis/Acl/Is',
-can: 'Adonis/Acl/Can',
-requestType:'App/Middleware/RequestTypeMiddleware'
-``` 
-- In `start/app.js`, make sure the following exists in `providers` array:
-```
-'adonis-acl/providers/AclProvider',
-'@adonisjs/validator/providers/ValidatorProvider'
-```
-- In `start/app.js`, add the following to alias array:
-```
-Role: 'Adonis/Acl/Role',
-Permission: 'Adonis/Acl/Permission',
-```
-- In `start/app.js`, add the following to `commands` array:
-```
-'@shagital/crud-generator/src/Commands/CrudInitCommand',
-'@shagital/crud-generator/src/Commands/CrudGeneratorCommand',
-'@shagital/crud-generator/src/Commands/PermissionMigrationGeneratorCommand',
-'@shagital/crud-generator/src/Commands/ControllerGeneratorCommand',
-'@shagital/crud-generator/src/Commands/ModelGeneratorCommand',
-'@shagital/crud-generator/src/Commands/ViewGeneratorCommand',
-```
 - The default admin email is `administrator@webmail.com`. You can change the email before running migration
 - Run migration `adonis migration:run` to create admin user and set up roles and permissions
 - Start your adonis app `adonis serve`
-- Cd to the vue app directory `cd /resources/views/admin`
+- Change to the vue app directory `cd /resources/views/admin`
 - Run `npm install` or `yarn install` to install dependencies
 - At this point, your admin dashboard should be ready to use
 - Run `npm run dev` or `yarn dev` to start the admin app in development mode
