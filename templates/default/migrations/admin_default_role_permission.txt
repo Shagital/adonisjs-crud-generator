@@ -1,0 +1,87 @@
+import {{userModel}} from '{{userModelNamespace}}'
+import Hash from '@ioc:Adonis/Core/Hash'
+import Permission from 'App/Models/Permission'
+import Role from 'App/Models/Role'
+import BaseSchema from '@ioc:Adonis/Lucid/Schema'
+import Config from '@ioc:Adonis/Core/Config'
+import UserRole from 'App/Models/UserRole'
+import RolePermission from 'App/Models/RolePermission'
+
+/**
+ * Class FillDefaultAdminUserAndPermissions
+ */
+export default class FillDefaultAdminUserAndPermissions extends BaseSchema
+{
+  public async up() {
+    let roleName = Config.get('crudGenerator.admin_role', 'administrator');
+
+    let user = {
+      email: Config.get('crudGenerator.admin_email', 'administrator@webmail.com'),
+      password: {{password}}
+    }
+
+    let requiredColumns = User.$columnsDefinitions
+
+    requiredColumns.forEach(({ columnName }) => {
+      if (!user.hasOwnProperty(columnName) && columnName !== User.primaryKey) {
+        user[columnName] = ''
+      }
+    })
+
+    let permissions = [
+      // view admin as a whole
+      'admin',
+
+      // manage translations
+      'admin.translation.index',
+      'admin.translation.edit',
+      'admin.translation.rescan',
+
+      // manage users (access)
+      'admin.admin-user.index',
+      'admin.admin-user.create',
+      'admin.admin-user.edit',
+      'admin.admin-user.delete',
+
+      // ability to upload
+      'admin.upload',
+
+      //ability to impersonal login
+      'admin.admin-user.impersonal-login'
+    ].map((s) => {
+      return {
+        name: s,
+        slug: s
+      }
+    })
+
+
+    let adminUser = await {{model}}.firstOrCreate({email: user.email}, user);
+    await {{model}}.query()
+    .where('id', adminUser.id)
+    .update({password: await Hash.make(user.password)})
+
+
+    let permissionIds: Array<number> = [];
+    for(let p of permissions) {
+      let permission = await Permission.firstOrCreate({name: p.name}, p);
+      permissionIds.push(permission.id)
+    }
+
+    let role = await Role.firstOrCreate({slug:roleName}, {name:roleName, slug:roleName});
+    await RolePermission.createMany(
+      permissionIds.map((id) => {
+        return {
+          role_id: role.id,
+          permission_id: id,
+        }
+      })
+    )
+    await UserRole.create({ user_id: adminUser.id, role_id: role.id })
+
+  }
+
+  public async down() {
+
+  }
+}

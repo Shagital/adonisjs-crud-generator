@@ -1,0 +1,6 @@
+yarn.lock
+.idea
+.vscode
+yarn-error.log
+build
+node_modules

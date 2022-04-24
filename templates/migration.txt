@@ -1,0 +1,57 @@
+import {{userModel}} from '{{userModelNamespace}}'
+import Permission from 'App/Models/Permission'
+import Role from 'App/Models/Role'
+import BaseSchema from '@ioc:Adonis/Lucid/Schema'
+import Config from '@ioc:Adonis/Core/Config'
+import UserRole from 'App/Models/UserRole'
+import RolePermission from 'App/Models/RolePermission'
+
+/**
+ * Class FillDefaultAdminUserAndPermissionsFor{{pascalCase}}
+ */
+export default class FillDefaultAdminUserAndPermissionsFor{{pascalCase}} extends BaseSchema
+{
+  public async up() {
+    let permissions = [
+      // view {{pascalCase}} as a whole
+      '{{model}}',
+
+      // manage {{pascalCase}} (access)
+      'admin.{{model}}.index',
+      'admin.{{model}}.create',
+      'admin.{{model}}.edit',
+      'admin.{{model}}.delete',
+
+    ].map((s) => {
+      return {
+        name: s,
+        slug: s
+      }
+    });
+
+
+    let admin = await User.query()
+      .where('email', Config.get('crudGenerator.admin_email', 'administrator@webmail.com'))
+      .firstOrFail()
+
+    let permissionIds: Array<number> = [];
+    for(let p of permissions) {
+      let permission = await Permission.firstOrCreate({name: p.name}, p);
+      permissionIds.push(permission.id);
+    }
+
+    let role = await Role.query()
+    .where('name', Config.get('crudGenerator.admin_role', 'administrator'))
+    .firstOrFail()
+    await RolePermission.createMany(permissionIds.map((id) => {
+    return {
+      role_id: role.id,
+      permission_id: id
+    }}))
+    await UserRole.firstOrCreate({ user_id: admin.id, role_id: role.id })
+  }
+
+  public async down() {
+
+  }
+}

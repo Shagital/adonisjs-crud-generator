@@ -1,0 +1,141 @@
+import { ResponseContract, HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { schema, rules, validator } from '@ioc:Adonis/Core/Validator'
+import {{pascalName}} from 'App/Models/{{pascalName}}'
+import moment from 'moment'
+
+const tableColumns = {{tableColumns}}
+const allowedRelationships = {{pascalName}}.allowedRelationships()
+
+/**
+ * Resourceful controller for interacting with {{pluralName}}
+ */
+export default class {{pascalNamePlural}}Controller {
+  /**
+   * Show a list of all {{pluralName}}.
+   * GET {{prefix}}/{{pluralName}}
+   *
+   */
+  public async index ({ request, response }: HttpContextContract): ResponseContract {
+    let qs = request.qs()
+    let query = {{pascalName}}.query()
+    {{filters}}
+
+    if (qs.with) {
+      let requestedRelationships = qs.with ? qs.with.split(',') : []
+      for(let relationship of requestedRelationships) {
+        if(allowedRelationships.includes(relationship)) {
+          query.preload(relationship)
+        }
+      }
+    }
+
+    let orderBy = {{pascalName}}.primaryKey
+    let order: 'desc' | 'asc' = 'desc'
+    if(qs.sort) {
+      let split = qs.sort.split('|')
+
+      if(tableColumns.includes(split[0]) && ['desc', 'asc'].includes(split[1].toLowerCase())) {
+        orderBy = split[0]
+        order = split[1].toLowerCase()
+      }
+    }
+    query.orderBy(orderBy, order)
+
+    let data = await query.paginate(qs.page || 1, qs.per_page || 25)
+
+    return response.send(data)
+  }
+
+  /**
+   * Create/save a new {{singularName}}.
+   * POST {{prefix}}/{{pluralName}}
+   *
+   */
+  public async store ({ params, request, response }: HttpContextContract): ResponseContract {
+    const data = request.only({{filteredColumns}})
+
+    let validationErrors = {}
+    try {
+      await validator.validate({
+        schema: schema.create({
+          {{rulesArray}}
+        }),
+        data,
+      })
+    } catch (e) {
+      validationErrors = e.messages
+    }
+
+    if (Object.keys(validationErrors).length) {
+        return response.status(422).send({errors: validationErrors})
+    }
+
+    let {{singularName}} = await {{pascalName}}.create(data)
+    let message = "{{pascalName}} created successfully"
+
+    return response.status(201).send({ message, data: {{singularName}} })
+  }
+
+  /**
+   * Display a single {{singularName}}.
+   * GET {{prefix}}/{{pluralName}}/:id
+   *
+   */
+  public async show ({ params, response }: HttpContextContract): ResponseContract {
+    let {{singularName}} = await {{pascalName}}.findOrFail(params[{{pascalName}}.primaryKey])
+
+    let data = {data: {{singularName}}}
+
+    return response.send(data)
+  }
+
+  /**
+   * Update {{singularName}} details.
+   * PATCH {{prefix}}/{{pluralName}}/:id
+   *
+   */
+  public async update ({ params, request, response }: HttpContextContract): ResponseContract {
+    const data = request.only({{filteredColumns}})
+    let validationErrors = {}
+    try {
+      await validator.validate({
+        schema: schema.create({
+          {{rulesArray}}
+        }),
+        data,
+      })
+    } catch (e) {
+      validationErrors = e.messages
+    }
+
+    if (Object.keys(validationErrors).length) {
+        return response.status(422).send({errors: validationErrors})
+    }
+
+    let {{singularName}} = await {{pascalName}}.findOrFail(params[{{pascalName}}.primaryKey])
+    let filledData = {}
+    Object.keys(data).forEach(input => {
+      if(data[input]) filledData[input] = data[input]
+    })
+
+    {{singularName}}.merge(filledData)
+    await {{singularName}}.save()
+
+    let message = "{{pascalName}} updated successfully"
+
+    return response.status(200).send({ message, data: {{singularName}} })
+  }
+
+  /**
+   * Delete a {{singularName}} with id.
+   * DELETE {{prefix}}/{{pluralName}}/:id
+   *
+   */
+  public async destroy ({ params, response }: HttpContextContract): ResponseContract {
+    let {{singularName}} = await {{pascalName}}.findOrFail(params[{{pascalName}}.primaryKey])
+
+    {{singularName}}.delete()
+
+    return response.status(204).send('')
+  }
+}

@@ -1,0 +1,29 @@
+import { column, BaseModel, SnakeCaseNamingStrategy{{otherImports}}} from '@ioc:Adonis/Lucid/Orm'
+{{varImport}}
+
+export default class {{pascalName}} extends BaseModel {
+  public static namingStrategy = new SnakeCaseNamingStrategy()
+  public static primaryKey = '{{primaryColumn}}'
+  public static table = '{{tableName}}'
+  public static selfAssignPrimaryKey = {{autoIncrement}}
+  {{columnDefinitions}}
+
+  public static boot () {
+    if (this.booted) {
+       return
+    }
+    super.boot()
+
+    this.before('create', async (_modelInstance) => { {{createHook}} })
+    this.before('update', async (_modelInstance) => { {{updateHook}} })
+  }
+
+  {{methods}}
+
+  {{relationships}}
+
+  public static allowedRelationships(): Array<string> {
+    return {{relationshipArray}}
+  }
+
+}

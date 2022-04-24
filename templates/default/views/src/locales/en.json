@@ -1,0 +1,72 @@
+{
+  "admin" : "Admin",
+  "admin_dashboard_title" : "Admin",
+  "dashboard" : "Dashboard",
+  "id" : "id",
+  "created_at" : "Created At",
+  "from" : "From",
+  "to" : "To",
+  "create" : "Create",
+  "update" : "Update",
+  "page" : "Page",
+  "pagination_showing" : "Showing page {current_page} of {last_page}",
+  "go_home" : "Go Home",
+  "not_found" : "{resource} not found",
+  "login" : {
+    "email_label" : "Email",
+    "password_label" : "Password",
+    "email_placeholder" : "Enter your email",
+    "password_placeholder" : "Enter your password",
+    "title" : "Login",
+    "button" : "Sign In"
+  },
+  "profile" : {
+    "title" : "Profile Update",
+    "header" : "Update Profile",
+    "change_password" : "Change Password",
+    "email_label" : "Email",
+    "password_label" : "Password",
+    "old_password_label" : "Old Password",
+    "confirm_password_label" : "Confirm Password",
+    "button" : "Update"
+  },
+  "delete" : {
+    "title" : "Delete {resource}",
+    "description" : "Are you sure you want to delete {resource}?"
+  },
+  "index" : {
+    "total_summary" : "{number} total {resource}",
+    "actions" : "Actions",
+    "delete" : "Delete",
+    "view" : "View",
+    "edit" : "Edit",
+    "clear_filters" : "Clear Filters",
+    "loading_data" : "Loading data",
+    "no_data" : "No data available"
+  },
+  "form" : {
+    "create_title" : "Create {resource}",
+    "edit_title" : "Edit {resource}"
+  },
+  "error" : {
+    "default" : "Failed to perform action. Please try again.",
+    "create" : "Failed to create {resource}. Please try again.",
+    "update" : "Failed to update {resource}. Please try again.",
+    "delete" : "Failed to delete {resource}. Please try again.",
+    "not_found" : "{resource} not found",
+    "access_denied" : "You're not allowed to perform this action."
+  },
+  "success" : {
+    "default" : "Operation successful",
+    "create" : "{resource} created successfully",
+    "update" : "{resource} updated successfully",
+    "delete" : "{resource} deleted successfully"
+  },
+  "remittance" : {
+    "name" :  "Remittance",
+    "plural" : "Remittances",
+    "column" : {
+
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "name": "@shagital/adonisjs-crud-generator",
+  "version": "3.0.1",
+  "description": "Adonisjs Admin Panel Generator is a package that helps you quickly scaffold your typical CRUD admin interfaces. It generates the admin panel code based on the existing (migrated) table in the database",
+  "main": "build/commands/index.js",
+  "types": "build/adonis-typings/index.d.ts",
+  "scripts": {
+    "compile": "tsc",
+    "prebuild": "rimraf ./build",
+    "build": "npm run compile && npm run copyfiles",
+    "lint": "eslint --ignore-path .gitignore",
+    "format": "prettier \"**/*.ts\" --write --ignore-path .gitignore",
+    "prepublishOnly": "npm run build",
+    "copyfiles": "cp -R templates build && cp -R config build"
+  },
+  "keywords": [
+    "adonisjs",
+    "crud",
+    "admin",
+    "dashboard",
+    "controller",
+    "model",
+    "views",
+    "resource",
+    "i18n",
+    "vue"
+  ],
+  "author": "Zacchaeus Bolaji <zacchaeus@shagital.com>",
+  "license": "MIT",
+  "dependencies": {
+    "moment": "^2.29.3",
+    "mysql": "^2.18.1",
+    "pg": "^8.4.2",
+    "pluralize": "^8.0.0",
+    "sqlite3": "^5.0.0",
+    "fs-extra": "^10.1.0",
+    "@shagital/adonisjs-acl": ">=0.0.1"
+  },
+  "devDependencies": {
+    "@adonisjs/core": ">=5.0.0",
+    "@adonisjs/lucid": "^17.2.0",
+    "@adonisjs/mrm-preset": "^5.0.3",
+    "@types/node": "^14.14.28",
+    "@types/pluralize": "^0.0.29",
+    "copyfiles": "^2.4.1",
+    "eslint": "^7.20.0",
+    "eslint-plugin-adonis": "^1.2.1",
+    "eslint-plugin-vue": "^8.6.0",
+    "typescript": "^4.1.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shagital/adonisjs-crud-generator.git"
+  },
+  "homepage": "https://github.com/Shagital/adonisjs-crud-generator",
+  "publishConfig": {
+    "access": "public"
+  },
+  "typings": "build/adonis-typings/index.d.ts",
+  "adonisjs": {
+    "types": "@shagital/adonisjs-crud-generator",
+    "commands": [
+      "@shagital/adonisjs-crud-generator/build/commands"
+    ]
+  }
+}

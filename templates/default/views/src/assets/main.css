@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900&display=swap');
+
+@import 'tailwindcss/base';
+
+@import 'tailwindcss/components';
+
+@import 'tailwindcss/utilities';
+
+::-webkit-scrollbar-track{
+  background: #2D3748;
+}
+
+::-webkit-scrollbar-thumb{
+  background: #CBD5E0;
+}
+
+::-webkit-scrollbar-thumb:hover{
+  background: #718096;
+}
+
+ul.pagination {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: flex-end;
+}
+ul.pagination li {
+  height: 30px;
+  text-align: center;
+  /* background: red; */
+  margin-right: 10px;
+  width: 30px;
+  border-radius: 5px;
+}
+input.rounded-l {
+  height: 43px;
+  border-radius: 5px;
+  border: 1px solid #e8e8e8;
+}
+ul.pagination li.active {
+  background: #00008b33;
+}
+.table-tt nav {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  padding: 10px;
+}
+.table-tt p.page-item {
+  width: 100%;
+}
+.blur {
+  -webkit-filter: blur(10px);
+  -moz-filter: blur(10px);
+  -o-filter: blur(10px);
+  -ms-filter: blur(10px);
+  filter: blur(10px);
+}
+
+a {
+  color : blue
+}
+a:hover {
+  color : orange
+}
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+table, th, td {
+  border: 1px solid;
+  overflow: auto;
+}
+table {
+  table-layout:fixed;
+  font-size: 0.9vw
+}
+
+tbody {
+  border: 1px #E4E4E4;
+}
+
+td {
+    overflow: scroll;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+}
+
+@media only screen and (max-width: 480px) {
+    /* horizontal scrollbar for tables if mobile screen */
+    .tablemobile {
+        overflow-x: scroll;
+        display: block;
+    }
+}
