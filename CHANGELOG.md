@@ -1,4 +1,6 @@
 # Changelog
+## 3.0.2
+- Dependabot patch for node-saas
 ## 3.0.0
 ### Rewrite
 - Typescript rewrite to support adonisjs v5
