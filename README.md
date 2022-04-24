@@ -70,13 +70,13 @@ Navigate to your app and you should see the `Region` menu on the sidebar
 ## Available Commands
 - `node ace crud:controller tableName`: This creates controller file and route
 - `node ace crud:model tableName`: This creates model file node ace relationships
-- `adonis crud:permission tableName`: This creates migration file for crud permissions
+- `node ace crud:permission tableName`: This creates migration file for crud permissions
 - `node ace crud:view tableName`: This creates vue files
 - `node ace crud:init tableName`: This runs all of the above commands
 
 ## Options
 - `--connection`: This option allows you specify which DB connection to use for the command e.g
-`adonis crud:controller tableName --connection=sqlite`
+`node ace crud:controller tableName --connection=sqlite`
 >NB: The connection must have been defined in `config/database.ts`
 
 - `--migrate`: This option is available for the `crud:generate` and `crud:permission` commands. It tells the system to automatically run the newly created migration files.

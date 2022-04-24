@@ -5,8 +5,7 @@
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "outDir": "build"
   },
-  "files": [
-    "./node_modules/@adonisjs/core/build/adonis-typings/index.d.ts"
-  ]
+  "exclude": ["node_modules", "build"]
 }

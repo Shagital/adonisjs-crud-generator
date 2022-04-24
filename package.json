@@ -1,9 +1,12 @@
 {
   "name": "@shagital/adonisjs-crud-generator",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Adonisjs Admin Panel Generator is a package that helps you quickly scaffold your typical CRUD admin interfaces. It generates the admin panel code based on the existing (migrated) table in the database",
-  "main": "build/commands/index.js",
-  "types": "build/adonis-typings/index.d.ts",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "files": [
+    "build/**/*"
+  ],
   "scripts": {
     "compile": "tsc",
     "prebuild": "rimraf ./build",
@@ -24,7 +27,10 @@
     "views",
     "resource",
     "i18n",
-    "vue"
+    "vue",
+    "translation",
+    "permission",
+    "role"
   ],
   "author": "Zacchaeus Bolaji <zacchaeus@shagital.com>",
   "license": "MIT",
@@ -35,7 +41,7 @@
     "pluralize": "^8.0.0",
     "sqlite3": "^5.0.0",
     "fs-extra": "^10.1.0",
-    "@shagital/adonisjs-acl": ">=0.0.1"
+    "@shagital/adonisjs-acl": "^1.0.0"
   },
   "devDependencies": {
     "@adonisjs/core": ">=5.0.0",
