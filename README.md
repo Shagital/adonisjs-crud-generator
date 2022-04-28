@@ -36,7 +36,7 @@ Or with yarn
 ``` bash
 yarn add @shagital/adonisjs-crud-generator
 ```
-
+Configure the package using `node ace @shagital/adonisjs-crud-generator`. This should update your `.adonisrc.json` file
 ## Setup
 - Ensure your app is completely setup with `@adonisjs/auth` and `@adonisjs/lucid`
 - If you choose to use redis to save tokens, you have to install `@adonisjs/redis'
