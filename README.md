@@ -38,6 +38,7 @@ yarn add @shagital/adonisjs-crud-generator
 ```
 
 ## Setup
+- Configure the package using `node ace configure @shagital/adonisjs-crud-generator`. This should update your `.adonisrc.json` file.
 - Ensure your app is completely setup with `@adonisjs/auth` and `@adonisjs/lucid`
 - If you choose to use redis to save tokens, you have to install `@adonisjs/redis'
 - Depending on which hashing algorithm you choose in `config/hash.ts`, you'll have to install the corresponding dependency e.g `phc-bcrypt` for bcrypt.
