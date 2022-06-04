@@ -24,7 +24,7 @@ This package allows you easily generate admin dashboard for your existing [Adoni
 - PostgreSQL >=10
 
 ## Dependencies
-- [Adonis ACL](https://github.com/@shagital/adonisjs-acl) for role and permission management
+- [Adonis ACL](https://github.com/shagital/adonisjs-acl) for role and permission management
 
 ## Installation
 
